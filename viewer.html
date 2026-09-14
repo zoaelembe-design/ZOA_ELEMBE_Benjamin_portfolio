@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultation du document</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{background:#12181a;margin:0;}
+  .viewer-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:#0c1012;border-bottom:1px solid #22292b;}
+  .viewer-header a.back{color:#d7dfe0;text-decoration:none;font-size:14px;opacity:.8;}
+  .viewer-header a.back:hover{opacity:1;}
+  .viewer-title{color:#fff;font-size:15px;font-weight:600;text-align:center;flex:1;}
+  .viewer-note{color:#9aa5a7;font-size:12px;text-align:center;padding:10px 16px;background:#171f21;}
+  .pages{max-width:900px;margin:0 auto;padding:20px 12px 80px;user-select:none;-webkit-user-select:none;}
+  .pages img{width:100%;display:block;margin:0 auto 18px;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.4);pointer-events:none;}
+  .page-loading{color:#9aa5a7;text-align:center;padding:60px 0;font-size:14px;}
+  @media print{
+    body::before{content:"Impression désactivée pour ce document.";display:block;text-align:center;padding:40px;font-size:20px;}
+    .pages, .viewer-header, .viewer-note{display:none !important;}
+  }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<div class="viewer-header">
+  <a class="back" href="index.html#documents">← Retour au portfolio</a>
+  <div class="viewer-title" id="docTitle">Document</div>
+  <div style="width:110px"></div>
+</div>
+<div class="viewer-note">Consultation en ligne uniquement — téléchargement, impression et copie désactivés.</div>
+
+<div class="pages" id="pages"><div class="page-loading">Chargement des pages…</div></div>
+
+<script>
+  const docs = {
+    excel: { title: "Excel pour le forestier", folder: "assets/secure/excel", count: 56 },
+    manuel: { title: "Manuel LaVision DuForestier", folder: "assets/secure/manuel", count: 78 }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get("doc");
+  const doc = docs[key];
+  const container = document.getElementById("pages");
+  const titleEl = document.getElementById("docTitle");
+
+  if (!doc) {
+    container.innerHTML = '<div class="page-loading">Document introuvable.</div>';
+  } else {
+    titleEl.textContent = doc.title;
+    container.innerHTML = "";
+    for (let i = 1; i <= doc.count; i++) {
+      const num = String(i).padStart(2, "0");
+      const img = document.createElement("img");
+      img.src = `${doc.folder}/page-${num}.jpg`;
+      img.loading = "lazy";
+      img.draggable = false;
+      img.alt = `${doc.title} — page ${i}`;
+      container.appendChild(img);
+    }
+  }
+
+  // Dissuasions basiques (non infaillibles) : clic droit, glisser-déposer, raccourcis d'impression/enregistrement
+  document.addEventListener("dragstart", e => e.preventDefault());
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && ["p","s","u"].includes(e.key.toLowerCase())) {
+      e.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>
